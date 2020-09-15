@@ -195,7 +195,7 @@ class Mgz2lut_report(ChrisApp):
         
         f = open(report_path,'r')
         print(f.read())
-        print("Report saved as %s in %s format(s)" %(options.report_name, options.report_types))
+        print("Report saved as %s/%s in %s format(s)" %(options.outputdir,options.report_name, options.report_types))
     def show_man_page(self):
         """
         Print the app's man page.
