@@ -100,7 +100,7 @@ where necessary.)
 
 class Mgz2lut_report(ChrisApp):
     """
-    An app to generate a report on volumes of various brain segments listed in a Look-up Table (Default = FreeSurferLUT.txt).
+    An app to generate a report on volumes of various brain segments listed in a Look-up Table (Default = FreeSurferColorLUT.txt).
     """
     AUTHORS                 = 'Sandip Samal (sandip.samal@childrens.harvard.edu)'
     SELFPATH                = os.path.dirname(os.path.abspath(__file__))
@@ -183,12 +183,12 @@ class Mgz2lut_report(ChrisApp):
             print("Writing report as %s" %report_path)
             f = open(report_path,'a')
             f.truncate(0)
-            f.write("Index \t Label Name \t Volume \n")
+            f.write("Index \t Label Name \t\t\t\t Volume \n")
             line_count = 1
             for k in sorted(counter.keys()):
                 res_df=df_FSColorLUT.loc[df_FSColorLUT['#No'] == str(k),['LabelName']]
 
-                f.write ("%s\t%s\t%s%s" %(line_count, res_df['LabelName'].to_string(index=False),counter[k] ,"cc"))
+                f.write ("%s\t%s\t\t\t%s%s" %(line_count, res_df['LabelName'].to_string(index=False),counter[k]/1000 ,"cc"))
                 f.write('\n')
                 line_count = line_count + 1
             f.close()
