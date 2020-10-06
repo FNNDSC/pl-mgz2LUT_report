@@ -17,6 +17,7 @@ import numpy as np
 import collections
 import re
 import pandas as pd
+from yattag import Doc
 sys.path.append(os.path.dirname(__file__))
 
 # import the Chris app superclass
@@ -186,6 +187,40 @@ class Mgz2lut_report(ChrisApp):
             report_columns = ['Index','Label Name', 'Volume (in cc)']
             rep = pd.DataFrame(columns = report_columns)
             line_count = 1
+            ## Create an HTML report
+            if report_type == 'html':
+                doc, tag, text = Doc().tagtext()
+                with tag('html'):
+                    with tag('head'):
+                        with tag('link',rel='stylesheet' ,href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css"):
+                            with tag('style'):
+                                text('body{margin:0 100; background:whitesmoke;}')
+                    with tag('body'):
+                        with tag('h1'):
+                            text('Brain Segmentation Report')
+                        with tag('table', id = 'main', klass='table table-striped table-hover',text='report'):
+                            with tag('thead',klass='thead-dark'):
+                                with tag('tr'):
+                                    with tag('th',scope='col'):
+                                        text('Index')
+                                    with tag('th',scope='col'):
+                                        text('Label Name')    
+                                    with tag('th',scope='col'):
+                                        text('Volume (in cc)')
+                            for k in sorted(counter.keys()):
+                                res_df=df_FSColorLUT.loc[df_FSColorLUT['#No'] == str(k),['LabelName']]
+
+                                with tag('tr'):
+                                    with tag('td'):
+                                        text(line_count)
+                                    with tag('td'):
+                                        text(res_df['LabelName'].to_string(index=False))
+                                    with tag('td'):
+                                        text(counter[k]/1000)
+                                line_count = line_count + 1
+                result = doc.getvalue()
+                f.write(result)
+                continue;
             for k in sorted(counter.keys()):
                 res_df=df_FSColorLUT.loc[df_FSColorLUT['#No'] == str(k),['LabelName']]
 
