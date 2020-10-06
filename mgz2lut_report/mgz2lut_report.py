@@ -216,7 +216,7 @@ class Mgz2lut_report(ChrisApp):
                                     with tag('td'):
                                         text(res_df['LabelName'].to_string(index=False))
                                     with tag('td'):
-                                        text(counter[k]/1000)
+                                        text(round(counter[k]/1000,1))
                                 line_count = line_count + 1
                 result = doc.getvalue()
                 f.write(result)
@@ -224,7 +224,7 @@ class Mgz2lut_report(ChrisApp):
             for k in sorted(counter.keys()):
                 res_df=df_FSColorLUT.loc[df_FSColorLUT['#No'] == str(k),['LabelName']]
 
-                rep.loc[len(rep)]= [line_count, res_df['LabelName'].to_string(index=False),counter[k]/1000]
+                rep.loc[len(rep)]= [line_count, res_df['LabelName'].to_string(index=False),round(counter[k]/1000,1)]
                 line_count = line_count + 1
             if report_type == 'json':
                 rep = rep.to_json(orient='index')
