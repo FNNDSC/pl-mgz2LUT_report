@@ -21,18 +21,16 @@
 #   docker run -ti -e HOST_IP=$(ip route | grep -v docker | awk '{if(NF==11) print $9}') --entrypoint /bin/bash local/pl-mgz2LUT_report
 #
 
+FROM python:3.9.1-slim-buster
+LABEL maintainer="Sandip Samal <sandip.samal@childrens.harvard.edu>"
 
+WORKDIR /usr/local/src
 
-FROM fnndsc/ubuntu-python3:latest
-MAINTAINER fnndsc "dev@babymri.org"
-
-ENV APPROOT="/usr/src/mgz2lut_report"
-COPY ["mgz2lut_report", "${APPROOT}"]
-COPY ["requirements.txt", "${APPROOT}"]
-
-WORKDIR $APPROOT
-
-RUN pip install --upgrade pip
+COPY requirements.txt .
+COPY mgz2lut_report/FreeSurferColorLUT.txt .
 RUN pip install -r requirements.txt
 
-CMD ["mgz2lut_report.py", "--help"]
+COPY . .
+RUN pip install .
+
+CMD ["mgz2lut_report", "--help"]

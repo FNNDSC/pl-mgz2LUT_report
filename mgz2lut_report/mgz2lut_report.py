@@ -1,15 +1,12 @@
-#!/usr/bin/env python                                            
 #
 # mgz2lut_report ds ChRIS plugin app
 #
-# (c) 2016-2019 Fetal-Neonatal Neuroimaging & Developmental Science Center
+# (c) 2021 Fetal-Neonatal Neuroimaging & Developmental Science Center
 #                   Boston Children's Hospital
 #
 #              http://childrenshospital.org/FNNDSC/
 #                        dev@babyMRI.org
 #
-
-
 import os
 import sys
 import nibabel as nib
@@ -24,6 +21,7 @@ sys.path.append(os.path.dirname(__file__))
 from chrisapp.base import ChrisApp
 
 
+
 Gstr_title = """
                       _____  _       _                               _   
                      / __  \| |     | |                             | |  
@@ -33,24 +31,22 @@ Gstr_title = """
 |_| |_| |_|\__, /___|\_____/|_|\__,_|\__| |_|  \___| .__/ \___/|_|   \__|
             __/ |                     ______       | |                   
            |___/                     |______|      |_|                   
-
 """
 
 Gstr_synopsis = """
 
-(Edit this in-line help for app specifics. At a minimum, the 
-flags below are supported -- in the case of DS apps, both
-positional arguments <inputDir> and <outputDir>; for FS apps
-only <outputDir> -- and similarly for <in> <out> directories
-where necessary.)
 
     NAME
 
-       mgz2lut_report.py 
+       mgz2lut_report 
 
     SYNOPSIS
 
-        python mgz2lut_report.py                                         \\
+        mgz2lut_report                                                  \\
+            [--file_name <fileName>]                                    \\
+            [--report_name <reportName>]                                \\
+            [--report_types <reportTypes>]                              \\
+            [--LUT <lookUpFile>]                                        \\
             [-h] [--help]                                               \\
             [--json]                                                    \\
             [--man]                                                     \\
@@ -65,15 +61,37 @@ where necessary.)
 
         * Bare bones execution
 
-            mkdir in out && chmod 777 out
-            python mgz2lut_report.py   \\
-                                in    out
+            docker run --rm -u $(id -u)                             \\
+                -v $(pwd)/in:/incoming -v $(pwd)/out:/outgoing      \\
+                fnndsc/pl-mgz2LUT_report mgz2lut_report             \\
+                --file_name nameOfFile                              \\
+                /incoming /outgoing
 
     DESCRIPTION
 
-        `mgz2lut_report.py` ...
+        `mgz2lut_report` is  a simple script to generate a report 
+         (text,pdf, html, json) based on user's choice when an input 
+         .mgz file is provided. The default look up table used is 
+         FreeSurferColorLUT.txt but the user can specify their own 
+         look up file using the arg <lookUpFile>
 
     ARGS
+    
+        [--file_name <fileName>]
+        Specify the path of the input mgz file here
+                                            
+        [--report_name <reportName>]
+        If specified, creates an o/p in reportName
+        Default report name is mgz2LUT_report
+                                        
+        [--report_types <reportTypes>]
+        Specify comma separated file types to generate multiple reports
+        You can specify txt, json, pdf, html
+        Default is txt
+                                      
+        [--LUT <lookUpFile>]
+        If specified, the lookUpFile is referred instead to default LUT
+        Default LUT is FreeSurferColorLUT.txt                                     
 
         [-h] [--help]
         If specified, show help message and exit.
@@ -95,7 +113,6 @@ where necessary.)
         
         [--version]
         If specified, print version number and exit. 
-
 """
 
 
@@ -103,18 +120,11 @@ class Mgz2lut_report(ChrisApp):
     """
     An app to generate a report on volumes of various brain segments listed in a Look-up Table (Default = FreeSurferColorLUT.txt).
     """
-    AUTHORS                 = 'Sandip Samal (sandip.samal@childrens.harvard.edu)'
-    SELFPATH                = os.path.dirname(os.path.abspath(__file__))
-    SELFEXEC                = os.path.basename(__file__)
-    EXECSHELL               = 'python3'
-    TITLE                   = 'A segmented mgz reporting app'
+    PACKAGE                 = __package__
+    TITLE                   = 'A ChRIS plugin app'
     CATEGORY                = ''
     TYPE                    = 'ds'
-    DESCRIPTION             = 'An app to generate a report on volumes of various brain segments listed in a Look-up Table (Default = FreeSurferLUT.txt)'
-    DOCUMENTATION           = 'http://wiki'
-    VERSION                 = '0.1'
     ICON                    = '' # url of an icon image
-    LICENSE                 = 'Opensource (MIT)'
     MAX_NUMBER_OF_WORKERS   = 1  # Override with integer value
     MIN_NUMBER_OF_WORKERS   = 1  # Override with integer value
     MAX_CPU_LIMIT           = '' # Override with millicore value as string, e.g. '2000m'
@@ -142,10 +152,34 @@ class Mgz2lut_report(ChrisApp):
         Define the CLI arguments accepted by this plugin app.
         Use self.add_argument to specify a new app argument.
         """
-        self.add_argument('--file_name', dest='file_name',type = str,optional = True, help="Segmented mgz file name", default="aparc.a2009s+aseg.mgz")
-        self.add_argument('--report_name', dest='report_name',type = str,optional = True, help="Output report name", default="mgz2LUT_report")
-        self.add_argument('--report_types', dest='report_types',type = str,optional = True, help="comma separated output report file types", default="pdf")
-        self.add_argument('--LUT', dest='LUT',type = str,optional = True, help="Look Up File Name", default="FreeSurferColorLUT.txt")
+        self.add_argument('--file_name',
+                             dest='file_name',
+                             type = str,
+                             optional = True, 
+                             help="Segmented mgz file name",
+                             default="aparc.a2009s+aseg.mgz")
+                             
+        self.add_argument('--report_name', 
+                             dest='report_name',
+                             type = str,
+                             optional = True, 
+                             help="Output report name", 
+                             default="mgz2LUT_report")
+                             
+        self.add_argument('--report_types', 
+                             dest='report_types',
+                             type = str,
+                             optional = True,
+                             help="comma separated output report file types", 
+                             default="txt")
+                             
+        self.add_argument('--LUT',
+                             dest='LUT',
+                             type = str,
+                             optional = True, 
+                             help="Look Up File Name", 
+                             default="FreeSurferColorLUT.txt")
+                             
     def run(self, options):
         """
         Define the code to be run by this plugin app.
@@ -236,14 +270,9 @@ class Mgz2lut_report(ChrisApp):
         f = open(report_path,'r')
         print(f.read())
         print("Report saved as %s/%s in %s format(s)" %(options.outputdir,options.report_name, options.report_types))
+        
     def show_man_page(self):
         """
         Print the app's man page.
         """
         print(Gstr_synopsis)
-
-
-# ENTRYPOINT
-if __name__ == "__main__":
-    chris_app = Mgz2lut_report()
-    chris_app.launch()

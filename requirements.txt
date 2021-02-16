@@ -1,4 +1,5 @@
-chrisapp
+chrisapp~=2.4.0
+nose~=1.3.7
 pudb
 nibabel
 pandas
