@@ -15,6 +15,7 @@ import collections
 import re
 import pandas as pd
 from yattag import Doc
+import pdfkit
 sys.path.append(os.path.dirname(__file__))
 
 # import the Chris app superclass
@@ -222,7 +223,7 @@ class Mgz2lut_report(ChrisApp):
             rep = pd.DataFrame(columns = report_columns)
             line_count = 1
             ## Create an HTML report
-            if report_type == 'html':
+            if report_type == 'html' or report_type == 'pdf':
                 doc, tag, text = Doc().tagtext()
                 with tag('html'):
                     with tag('head'):
@@ -254,6 +255,10 @@ class Mgz2lut_report(ChrisApp):
                                 line_count = line_count + 1
                 result = doc.getvalue()
                 f.write(result)
+                if report_type == 'pdf':
+                    f = open("report.html",'a')
+                    f.write(result)
+                    pdfkit.from_file("report.html",report_path)
                 continue;
             for k in sorted(counter.keys()):
                 res_df=df_FSColorLUT.loc[df_FSColorLUT['#No'] == str(k),['LabelName']]
@@ -261,14 +266,15 @@ class Mgz2lut_report(ChrisApp):
                 rep.loc[len(rep)]= [line_count, res_df['LabelName'].to_string(index=False),round(counter[k]/1000,1)]
                 line_count = line_count + 1
             if report_type == 'json':
-                rep = rep.to_json(orient='index')
-                f.write(rep)
+                f.write(rep.to_json(orient='index'))
+            if report_type == 'csv':
+                f.write(rep.to_csv(index=False))
             else:
                 f.write(rep.to_string(index=False))
             f.close()
         
         f = open(report_path,'r')
-        print(f.read())
+        #print(f.read())
         print("Report saved as %s/%s in %s format(s)" %(options.outputdir,options.report_name, options.report_types))
         
     def show_man_page(self):

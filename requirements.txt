@@ -4,3 +4,5 @@ pudb
 nibabel
 pandas
 yattag
+pdfkit
+fpdf
