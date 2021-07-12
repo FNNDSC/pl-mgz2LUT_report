@@ -6,8 +6,8 @@ with open(path.join(path.dirname(path.abspath(__file__)), 'README.rst')) as f:
 
 setup(
     name             = 'mgz2lut_report',
-    version          = '1.0.2',
-    description      = 'An app to ...',
+    version          = '1.1.0',
+    description      = 'An app to generate a report on volumes of various brain segments listed in a Look-up Table (Default =     FreeSurferColorLUT.txt',
     long_description = readme,
     author           = 'Sandip Samal',
     author_email     = 'sandip.samal@childrens.harvard.edu',

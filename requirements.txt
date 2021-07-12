@@ -5,4 +5,3 @@ nibabel
 pandas
 yattag
 pdfkit
-fpdf
