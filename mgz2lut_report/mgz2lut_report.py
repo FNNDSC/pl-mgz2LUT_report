@@ -262,7 +262,12 @@ class Mgz2lut_report(ChrisApp):
                     opt = {
                         'quiet':''
                         }
-                    pdfkit.from_file("/tmp/report.html",report_path,options=opt)
+                    try:
+                        config = pdfkit.configuration()
+                        print (config)
+                    except OSError:
+                        print ("missing wkhtmltopdf")
+                    pdfkit.from_file("/tmp/report.html",report_path,options=opt,configuration=config)
                 continue;
             for k in sorted(counter.keys()):
                 res_df=df_FSColorLUT.loc[df_FSColorLUT['#No'] == str(k),['LabelName']]

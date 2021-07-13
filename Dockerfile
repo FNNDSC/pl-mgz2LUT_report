@@ -27,7 +27,7 @@ RUN apt-get update \
     && apt-get install -y libsm6 libxext6 libxrender-dev wkhtmltopdf xvfb \
     && rm -rf /var/lib/apt/lists/*
     
-ENV XDG_RUNTIME_DIR=/usr/local/src
+ENV XDG_RUNTIME_DIR=/bin/wkhtmltopdf
 ENV RUNLEVEL=3
 
 WORKDIR /usr/local/src
