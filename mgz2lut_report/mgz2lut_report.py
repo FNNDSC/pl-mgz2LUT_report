@@ -266,8 +266,9 @@ class Mgz2lut_report(ChrisApp):
                 rep.loc[len(rep)]= [line_count, res_df['LabelName'].to_string(index=False),round(counter[k]/1000,1)]
                 line_count = line_count + 1
             if report_type == 'json':
-                f.write(rep.to_json(orient='index'))
-            if report_type == 'csv':
+                rep = rep.to_json(orient='index')
+                f.write(rep)
+            elif report_type == 'csv':
                 f.write(rep.to_csv(index=False))
             else:
                 f.write(rep.to_string(index=False))
