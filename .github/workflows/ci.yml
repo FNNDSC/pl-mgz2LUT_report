@@ -13,22 +13,12 @@ name: ci
 
 on:
   push:
-    # we have to guess what the name of the default branch is
-    branches: [ master, main, trunk ]
+    branches: [ master ]
     tags: [ '**' ]
   pull_request:
-    branches: [ master, main, trunk ]
+    branches: [ master ]
 
 jobs:
-  test:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v2
-      - name: build
-        run: docker build -t "${GITHUB_REPOSITORY,,}" .
-      - name: nose tests
-        run: docker run "${GITHUB_REPOSITORY,,}" nosetests
-
   publish:
     if: github.event_name == 'push' || github.event_name == 'release'
     runs-on: ubuntu-20.04
@@ -36,7 +26,7 @@ jobs:
     # we want to both push the build to DockerHub, but also
     # keep a local copy so that we can run
     #
-    #     docker run fnndsc/pl-app app --json > App.json
+    #     docker run fnndsc/pl-mgz2lut_report mgz2lut_report --json > Mgz2lut_report.json
     #
     # buildx currently does not support multiple output locations,
     # neither can multi-architectural builds be loaded into docker.
@@ -130,11 +120,12 @@ jobs:
       - name: Upload to ChRIS Store
         if: "!endsWith(steps.determine.outputs.dock_image, ':latest')"
         run: |
-          repo=${{ steps.determine.outputs.repo }}
           dock_image=${{ steps.determine.outputs.dock_image }}
-          plname="$(sed 's/^.*\///' <<< $repo)" && echo "name=$plname"
+          plname="$(sed 's/^.*\///' <<< $GITHUB_REPOSITORY)" && echo "name=$plname"
           descriptor_file=$(mktemp --suffix .json)
-          cat > $descriptor_file <<< '${{ steps.pluginmeta.outputs.json }}'
+          cat > $descriptor_file << ENDOFPLUGINJSONDESCRIPTION
+          ${{ steps.pluginmeta.outputs.json }}
+          ENDOFPLUGINJSONDESCRIPTION
           res=$(
             curl -s -u "${{ secrets.CHRIS_STORE_USER }}" "https://chrisstore.co/api/v1/plugins/" \
               -H 'Accept:application/vnd.collection+json' \
@@ -154,4 +145,3 @@ jobs:
             echo "$res"
             exit $success
           fi
-
