@@ -263,6 +263,7 @@ class Mgz2lut_report(ChrisApp):
                     # when input is a html
                     for asset_file in files('mgz2lut_report').joinpath('assets').iterdir():
                         os.symlink(asset_file, os.path.join('/tmp', asset_file.name))
+                    os.symlink(report_path, os.path.join('/tmp', options.report_name + '.pdf'))
                     pdfkit.from_file("report.html",report_path)
                 continue;
             for k in sorted(counter.keys()):
