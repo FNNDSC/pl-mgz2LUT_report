@@ -259,7 +259,10 @@ class Mgz2lut_report(ChrisApp):
                 if report_type == 'pdf':
                     f = open("/tmp/report.html",'a')
                     f.write(result)
-                    pdfkit.from_file("/tmp/report.html",report_path)
+                    opt = {
+                        'quiet':''
+                        }
+                    pdfkit.from_file("/tmp/report.html",report_path,options=opt)
                 continue;
             for k in sorted(counter.keys()):
                 res_df=df_FSColorLUT.loc[df_FSColorLUT['#No'] == str(k),['LabelName']]
