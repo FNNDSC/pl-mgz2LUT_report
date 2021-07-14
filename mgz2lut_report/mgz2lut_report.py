@@ -259,15 +259,25 @@ class Mgz2lut_report(ChrisApp):
                 if report_type == 'pdf':
                     f = open("/tmp/report.html",'a')
                     f.write(result)
+                    
+                    # Certain .html files fail to be saved by pdfkit,
+                    # a hack is to open the file in read mode and then 
+                    # save it.
+                    f = open("/tmp/report.html",'r')
                     opt = {
                         'quiet':''
                         }
+                        
+                    # Ensure pdfkit config is available
                     try:
                         config = pdfkit.configuration()
                         print (config)
                     except OSError:
                         print ("missing wkhtmltopdf")
-                    pdfkit.from_file("/tmp/report.html",report_path,options=opt,configuration=config)
+                    try:
+                        pdfkit.from_file("/tmp/report.html",report_path,options=opt,configuration=config)
+                    except OSError:
+                        print ("failed to save pdf")
                 continue;
             for k in sorted(counter.keys()):
                 res_df=df_FSColorLUT.loc[df_FSColorLUT['#No'] == str(k),['LabelName']]
@@ -282,9 +292,7 @@ class Mgz2lut_report(ChrisApp):
             else:
                 f.write(rep.to_string(index=False))
             f.close()
-        
-        f = open(report_path,'r')
-        #print(f.read())
+
         print("Report saved as %s/%s in %s format(s)" %(options.outputdir,options.report_name, options.report_types))
         
     def show_man_page(self):

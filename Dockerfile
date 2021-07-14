@@ -24,7 +24,7 @@
 FROM python:3.9.1-slim-buster
 LABEL maintainer="Sandip Samal <sandip.samal@childrens.harvard.edu>"
 RUN apt-get update \
-    && apt-get install -y libsm6 libxext6 libxrender-dev wkhtmltopdf xvfb \
+    && apt-get install -y wkhtmltopdf xvfb \
     && rm -rf /var/lib/apt/lists/*
     
 ENV XDG_RUNTIME_DIR=/bin/wkhtmltopdf
