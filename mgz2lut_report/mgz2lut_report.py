@@ -257,25 +257,8 @@ class Mgz2lut_report(ChrisApp):
                 result = doc.getvalue()
                 f.write(result)
                 if report_type == 'pdf':
-                    f = open("/tmp/report.html",'a')
-                    f.write(result)
-                    
-                    # Certain .html files fail to be saved by pdfkit,
-                    # a hack is to open the file in read mode and then 
-                    # save it.
-                    f = open("/tmp/report.html",'r')
-                    opt = {
-                        'quiet':''
-                        }
-                        
-                    # Ensure pdfkit config is available
                     try:
-                        config = pdfkit.configuration()
-                        print (config)
-                    except OSError:
-                        print ("missing wkhtmltopdf")
-                    try:
-                        pdfkit.from_file("/tmp/report.html",report_path,options=opt,configuration=config)
+                        pdfkit.from_string(result,report_path)
                     except OSError:
                         print ("failed to save pdf")
                 continue;
