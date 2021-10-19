@@ -6,7 +6,7 @@ with open(path.join(path.dirname(path.abspath(__file__)), 'README.rst')) as f:
 
 setup(
     name             = 'mgz2lut_report',
-    version          = '1.3.1',
+    version          = '1.3.2',
     description      = 'An app to generate a report on volumes of various brain segments listed in a Look-up Table (Default =     FreeSurferColorLUT.txt',
     long_description = readme,
     author           = 'Sandip Samal',
@@ -18,7 +18,7 @@ setup(
     tests_require    = ['nose'],
     license          = 'MIT',
     zip_safe         = False,
-    python_requires  = '>=3.8',
+    python_requires  = '>=3.6',
     entry_points     = {
         'console_scripts': [
             'mgz2lut_report = mgz2lut_report.__main__:main'

@@ -18,6 +18,8 @@ import pandas as pd
 from yattag import Doc
 import pdfkit
 sys.path.append(os.path.dirname(__file__))
+from fpdf import FPDF
+
 
 # import the Chris app superclass
 from chrisapp.base import ChrisApp
@@ -259,8 +261,14 @@ class Mgz2lut_report(ChrisApp):
                 if report_type == 'pdf':
                     try:
                         pdfkit.from_string(result,report_path)
-                    except OSError:
-                        print ("failed to save pdf")
+                    except OSError as err:
+                        # Catch exception
+                        print ("failed to save pdf:",err)
+                        pdf=FPDF()
+                        pdf.add_page()
+                        pdf.set_font('Courier','B',16)
+                        pdf.cell(40,10,result)
+                        pdf.output(report_path,'F')
                 continue;
             for k in sorted(counter.keys()):
                 res_df=df_FSColorLUT.loc[df_FSColorLUT['#No'] == str(k),['LabelName']]
